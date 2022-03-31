@@ -633,6 +633,8 @@ def add_cmdline_checks(l, arch):
     #     CmdlineCheck(reason, decision, name, expected)
 
     l += [CmdlineCheck('self_protection', 'kspp', 'randomize_kstack_offset', 'on')]
+    l += [CmdlineCheck('self_protection', 'kspp', 'slab_nomerge', '')]
+    l += [CmdlineCheck('self_protection', 'clipos', 'page_alloc.shuffle', '1')]
     # TODO: add other
 
 

@@ -11,6 +11,8 @@
 #    slab_nomerge
 #    page_alloc.shuffle=1
 #    iommu=force (does it help against DMA attacks?)
+#    iommu.passthrough=0
+#    iommu.strict=1
 #    slub_debug=FZ (slow)
 #    init_on_alloc=1 (since v5.3)
 #    init_on_free=1 (since v5.3, otherwise slub_debug=P and page_poison=1)

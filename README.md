@@ -44,6 +44,12 @@ or simply run `./bin/kconfig-hardened-check` from the cloned repository.
 Some Linux distributions also provide `kconfig-hardened-check` as a package.
 
 ## Usage
+
+Example usage:
+```
+./bin/kconfig-hardened-check -p X86_64 -c ../linux-image-bsk/.config -m show_fail
+```
+
 ```
 usage: kconfig-hardened-check [-h] [--version] [-p {X86_64,X86_32,ARM64,ARM}]
                               [-c CONFIG]

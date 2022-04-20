@@ -10,7 +10,7 @@ current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfra
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 
-import kconfig_hardened_check
+import kconfig_safety_check
 
 if __name__ == "__main__":
-    kconfig_hardened_check.main()
+    kconfig_safety_check.main()

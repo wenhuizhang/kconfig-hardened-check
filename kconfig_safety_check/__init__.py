@@ -161,8 +161,8 @@ class ComplexOptCheck:
 class OR(ComplexOptCheck):
     # self.opts[0] is the option that this OR-check is about.
     # Use cases:
-    #     OR(<X_is_hardened>, <X_is_disabled>)
-    #     OR(<X_is_hardened>, <old_X_is_hardened>)
+    #     OR(<X_is_safety>, <X_is_disabled>)
+    #     OR(<X_is_safety>, <old_X_is_safety>)
     def check(self):
         if not self.opts:
             sys.exit('[!] ERROR: invalid OR check')
@@ -405,11 +405,11 @@ def main():
     #   * json mode for printing the results in JSON format
     report_modes = ['verbose', 'json', 'show_ok', 'show_fail']
     supported_archs = ['X86_64', 'X86_32', 'ARM64', 'ARM']
-    parser = ArgumentParser(prog='kconfig-hardened-check',
-                            description='A tool for checking the security hardening options of the Linux kernel')
+    parser = ArgumentParser(prog='kconfig-safety-check',
+                            description='A tool for checking safety options of the Linux kernel')
     parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
     parser.add_argument('-p', '--print', choices=supported_archs,
-                        help='print security hardening preferences for the selected architecture')
+                        help='print safety preferences for the selected architecture')
     parser.add_argument('-c', '--config',
                         help='check the kernel kconfig file against these preferences')
     parser.add_argument('-m', '--mode', choices=report_modes,
@@ -465,7 +465,7 @@ def main():
         arch = args.print
         add_kconfig_checks(config_checklist, arch)
         if mode != 'json':
-            print('[+] Printing kernel security hardening preferences for {}...'.format(arch))
+            print('[+] Printing kernel safety configuration preferences for {}...'.format(arch))
         print_checklist(mode, config_checklist, False)
         sys.exit(0)
 

@@ -252,12 +252,18 @@ def add_kconfig_checks(l, arch):
     #     KconfigCheck(reason, decision, name, expected)
 
     # elisa safety check
-    l += [KconfigCheck('elisa_safety', 'elisa', 'CONFIG_SLAB_FREELIST_RANDOM', 'y')]
+    l += [KconfigCheck('elisa_safety', 'elisa', 'SLAB_FREELIST_RANDOM', 'y')]
+    l += [KconfigCheck('elisa_safety', 'elisa', 'SLAB_FREELIST_HARDENED', 'y')]
+    l += [KconfigCheck('elisa_safety', 'elisa', 'SLAB_MERGE_DEFAULT', 'y')]
 
     if arch in ('X86_64', 'X86_32'):
-        l += [KconfigCheck('elisa_safety', 'elisa', 'CONFIG_SLAB_FREELIST_RANDOM', 'y')]
+        l += [KconfigCheck('elisa_safety', 'elisa', 'DEVKMEM', 'y')]
+        l += [KconfigCheck('elisa_safety', 'elisa', 'PAGE_TABLE_ISOLATION', 'y')]
     if arch in ('ARM', 'ARM64'):
-        l += [KconfigCheck('elisa_safety', 'elisa', 'CONFIG_SLAB_FREELIST_RANDOM', 'y')]
+        l += [KconfigCheck('elisa_safety', 'elisa', 'UNMAP_KERNEL_AT_EL0', 'y')]
+        l += [KconfigCheck('elisa_safety', 'elisa', 'HARDEN_BRANCH_PREDICTOR', 'y')]
+        l += [KconfigCheck('elisa_safety', 'elisa', 'HARDEN_EL2_VECTORS', 'y')]
+        l += [KconfigCheck('elisa_safety', 'elisa', 'ARM64_SSBD', 'y')]
 
 
 

@@ -1,13 +1,10 @@
 #!/usr/bin/python3
 
 #
-# This tool helps me to check Linux kernel options against
-# my security hardening preferences for X86_64, ARM64, X86_32, and ARM.
+# Linux kernel options checking against X86_64, ARM64, X86_32, and ARM.
 # Let the computers do their job!
 #
 # Author: Alexander Popov <alex.popov@linux.com>
-#
-# Please don't cry if my Python code looks like C.
 #
 #
 # N.B Hardening command line parameters:
@@ -313,9 +310,6 @@ def add_kconfig_checks(l, arch):
     #     KconfigCheck(reason, decision, name, expected)
 
     modules_not_set = KconfigCheck('cut_attack_surface', 'kspp', 'MODULES', 'is not set')
-    devmem_not_set = KconfigCheck('cut_attack_surface', 'kspp', 'DEVMEM', 'is not set') # refers to LOCKDOWN
-    bpf_syscall_not_set = KconfigCheck('cut_attack_surface', 'lockdown', 'BPF_SYSCALL', 'is not set') # refers to LOCKDOWN
-    efi_not_set = KconfigCheck('cut_attack_surface', 'my', 'EFI', 'is not set')
 
     # 'self_protection', 'defconfig'
     l += [KconfigCheck('self_protection', 'defconfig', 'BUG', 'y')]
@@ -462,20 +456,6 @@ def add_kconfig_checks(l, arch):
         l += [AND(KconfigCheck('self_protection', 'clipos', 'INTEL_IOMMU', 'y'),
                   iommu_support_is_set)]
 
-    # 'self_protection', 'my'
-    l += [OR(KconfigCheck('self_protection', 'my', 'RESET_ATTACK_MITIGATION', 'y'),
-             efi_not_set)] # needs userspace support (systemd)
-    if arch == 'X86_64':
-        l += [KconfigCheck('self_protection', 'my', 'SLS', 'y')] # vs CVE-2021-26341 in Straight-Line-Speculation
-        l += [AND(KconfigCheck('self_protection', 'my', 'AMD_IOMMU_V2', 'y'),
-                  iommu_support_is_set)]
-    if arch == 'ARM64':
-        l += [KconfigCheck('self_protection', 'my', 'SHADOW_CALL_STACK', 'y')] # depends on clang, maybe it's alternative to STACKPROTECTOR_STRONG
-        l += [KconfigCheck('self_protection', 'my', 'KASAN_HW_TAGS', 'y')]
-        cfi_clang_is_set = KconfigCheck('self_protection', 'my', 'CFI_CLANG', 'y')
-        l += [cfi_clang_is_set]
-        l += [AND(KconfigCheck('self_protection', 'my', 'CFI_PERMISSIVE', 'is not set'),
-                  cfi_clang_is_set)]
 
     # 'security_policy'
     if arch in ('X86_64', 'ARM64', 'X86_32'):
@@ -483,16 +463,9 @@ def add_kconfig_checks(l, arch):
     if arch == 'ARM':
         l += [KconfigCheck('security_policy', 'kspp', 'SECURITY', 'y')] # and choose your favourite LSM
     l += [KconfigCheck('security_policy', 'kspp', 'SECURITY_YAMA', 'y')]
-    l += [OR(KconfigCheck('security_policy', 'my', 'SECURITY_WRITABLE_HOOKS', 'is not set'),
-             KconfigCheck('security_policy', 'kspp', 'SECURITY_SELINUX_DISABLE', 'is not set'))]
     l += [KconfigCheck('security_policy', 'clipos', 'SECURITY_LOCKDOWN_LSM', 'y')]
     l += [KconfigCheck('security_policy', 'clipos', 'SECURITY_LOCKDOWN_LSM_EARLY', 'y')]
     l += [KconfigCheck('security_policy', 'clipos', 'LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY', 'y')]
-    l += [KconfigCheck('security_policy', 'my', 'SECURITY_SAFESETID', 'y')]
-    loadpin_is_set = KconfigCheck('security_policy', 'my', 'SECURITY_LOADPIN', 'y')
-    l += [loadpin_is_set] # needs userspace support
-    l += [AND(KconfigCheck('security_policy', 'my', 'SECURITY_LOADPIN_ENFORCE', 'y'),
-              loadpin_is_set)]
 
     # 'cut_attack_surface', 'defconfig'
     l += [OR(KconfigCheck('cut_attack_surface', 'defconfig', 'BPF_UNPRIV_DEFAULT_OFF', 'y'),
@@ -603,32 +576,16 @@ def add_kconfig_checks(l, arch):
     l += [KconfigCheck('cut_attack_surface', 'lockdown', 'MMIOTRACE_TEST', 'is not set')] # refers to LOCKDOWN
     l += [KconfigCheck('cut_attack_surface', 'lockdown', 'KPROBES', 'is not set')] # refers to LOCKDOWN
 
-    # 'cut_attack_surface', 'my'
-    l += [OR(KconfigCheck('cut_attack_surface', 'my', 'TRIM_UNUSED_KSYMS', 'y'),
-             modules_not_set)]
-    l += [KconfigCheck('cut_attack_surface', 'my', 'MMIOTRACE', 'is not set')] # refers to LOCKDOWN (permissive)
-    l += [KconfigCheck('cut_attack_surface', 'my', 'LIVEPATCH', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'my', 'IP_DCCP', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'my', 'IP_SCTP', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'my', 'FTRACE', 'is not set')] # refers to LOCKDOWN
-    l += [KconfigCheck('cut_attack_surface', 'my', 'VIDEO_VIVID', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'my', 'INPUT_EVBUG', 'is not set')] # Can be used as a keylogger
 
     # 'harden_userspace'
-    if arch in ('X86_64', 'ARM64', 'X86_32'):
+    if arch in ('X86_64', 'ARM64', 'X86_32', 'ARM'):
         l += [KconfigCheck('harden_userspace', 'defconfig', 'INTEGRITY', 'y')]
-    if arch == 'ARM':
-        l += [KconfigCheck('harden_userspace', 'my', 'INTEGRITY', 'y')]
     if arch == 'ARM64':
         l += [KconfigCheck('harden_userspace', 'defconfig', 'ARM64_MTE', 'y')]
     if arch in ('ARM', 'X86_32'):
         l += [KconfigCheck('harden_userspace', 'defconfig', 'VMSPLIT_3G', 'y')]
     if arch in ('X86_64', 'ARM64'):
         l += [KconfigCheck('harden_userspace', 'clipos', 'ARCH_MMAP_RND_BITS', '32')]
-    if arch in ('X86_32', 'ARM'):
-        l += [KconfigCheck('harden_userspace', 'my', 'ARCH_MMAP_RND_BITS', '16')]
-
-#   l += [KconfigCheck('feature_test', 'my', 'LKDTM', 'm')] # only for debugging!
 
 
 def print_unknown_options(checklist, parsed_options):

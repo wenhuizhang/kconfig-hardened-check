@@ -81,7 +81,10 @@ from .__about__ import __version__
 TYPES_OF_CHECKS = ('kconfig', 'version')
 
 class OptCheck:
-    def __init__(self, reason, decision, name, expected):
+    # Constructor without the 'expected' parameter is for option presence checks (any value is OK)
+    def __init__(self, reason, decision, name, expected=None):
+        if not reason or not decision or not name:
+            sys.exit('[!] ERROR: invalid {} check for "{}"'.format(self.__class__.__name__, name))
         self.name = name
         self.expected = expected
         self.decision = decision
@@ -90,6 +93,15 @@ class OptCheck:
         self.result = None
 
     def check(self):
+        # handle the option presence check
+        if self.expected is None:
+            if self.state is None:
+                self.result = 'FAIL: not present'
+            else:
+                self.result = 'OK: is present'
+            return
+
+        # handle the option value check
         if self.expected == self.state:
             self.result = 'OK'
         elif self.state is None:
@@ -101,7 +113,11 @@ class OptCheck:
             self.result = 'FAIL: "' + self.state + '"'
 
     def table_print(self, _mode, with_results):
-        print('{:<40}|{:^7}|{:^12}|{:^10}|{:^18}'.format(self.name, self.type, self.expected, self.decision, self.reason), end='')
+        if self.expected is None:
+            expected = ''
+        else:
+            expected = self.expected
+        print('{:<40}|{:^7}|{:^12}|{:^10}|{:^18}'.format(self.name, self.type, expected, self.decision, self.reason), end='')
         if with_results:
             print('| {}'.format(self.result), end='')
 
@@ -147,28 +163,6 @@ class VersionCheck:
     def table_print(self, _mode, with_results):
         ver_req = 'kernel version >= ' + str(self.ver_expected[0]) + '.' + str(self.ver_expected[1])
         print('{:<91}'.format(ver_req), end='')
-        if with_results:
-            print('| {}'.format(self.result), end='')
-
-
-class PresenceCheck:
-    def __init__(self, name, type):
-        self.type = type
-        if self.type == 'kconfig':
-            self.name = 'CONFIG_' + name
-        else:
-            sys.exit('[!] ERROR: unsupported type "{}" for {}'.format(type, self.__class__.__name__))
-        self.state = None
-        self.result = None
-
-    def check(self):
-        if self.state is None:
-            self.result = 'FAIL: not present'
-            return
-        self.result = 'OK: is present'
-
-    def table_print(self, _mode, with_results):
-        print('{:<91}'.format(self.name + ' is present'), end='')
         if with_results:
             print('| {}'.format(self.result), end='')
 
@@ -236,11 +230,18 @@ class OR(ComplexOptCheck):
         for i, opt in enumerate(self.opts):
             opt.check()
             if opt.result.startswith('OK'):
-                if opt.result == 'OK' and i != 0:
-                    # Simple OK is not enough for additional checks, add more info:
-                    self.result = 'OK: {} "{}"'.format(opt.name, opt.expected)
-                else:
-                    self.result = opt.result
+                self.result = opt.result
+                # Add more info for additional checks:
+                if i != 0:
+                    if opt.result == 'OK':
+                        self.result = 'OK: {} "{}"'.format(opt.name, opt.expected)
+                    elif opt.result == 'OK: not found':
+                        self.result = 'OK: {} not found'.format(opt.name)
+                    elif opt.result == 'OK: is present':
+                        self.result = 'OK: {} is present'.format(opt.name)
+                    # VersionCheck provides enough info
+                    elif not opt.result.startswith('OK: version'):
+                        sys.exit('[!] ERROR: unexpected OK description "{}"'.format(opt.result))
                 return
         self.result = self.opts[0].result
 
@@ -266,8 +267,10 @@ class AND(ComplexOptCheck):
                 elif opt.result == 'FAIL: not present':
                     self.result = 'FAIL: {} not present'.format(opt.name)
                 else:
-                    # This FAIL message is self-explaining.
+                    # VersionCheck provides enough info
                     self.result = opt.result
+                    if not opt.result.startswith('FAIL: version'):
+                        sys.exit('[!] ERROR: unexpected FAIL description "{}"'.format(opt.result))
                 return
         sys.exit('[!] ERROR: invalid AND check')
 
@@ -310,6 +313,9 @@ def add_kconfig_checks(l, arch):
     #     KconfigCheck(reason, decision, name, expected)
 
     modules_not_set = KconfigCheck('cut_attack_surface', 'kspp', 'MODULES', 'is not set')
+    devmem_not_set = KconfigCheck('cut_attack_surface', 'kspp', 'DEVMEM', 'is not set') # refers to LOCKDOWN
+    bpf_syscall_not_set = KconfigCheck('cut_attack_surface', 'lockdown', 'BPF_SYSCALL', 'is not set') # refers to LOCKDOWN
+    efi_not_set = KconfigCheck('cut_attack_surface', 'my', 'EFI', 'is not set')
 
     # 'self_protection', 'defconfig'
     l += [KconfigCheck('self_protection', 'defconfig', 'BUG', 'y')]
@@ -381,6 +387,9 @@ def add_kconfig_checks(l, arch):
     l += [KconfigCheck('self_protection', 'kspp', 'DEBUG_NOTIFIERS', 'y')]
     l += [KconfigCheck('self_protection', 'kspp', 'INIT_ON_ALLOC_DEFAULT_ON', 'y')]
     l += [KconfigCheck('self_protection', 'kspp', 'GCC_PLUGIN_LATENT_ENTROPY', 'y')]
+    l += [KconfigCheck('self_protection', 'kspp', 'KFENCE', 'y')]
+    l += [KconfigCheck('self_protection', 'kspp', 'WERROR', 'y')]
+    l += [KconfigCheck('self_protection', 'kspp', 'IOMMU_DEFAULT_DMA_STRICT', 'y')]
     randstruct_is_set = KconfigCheck('self_protection', 'kspp', 'GCC_PLUGIN_RANDSTRUCT', 'y')
     l += [randstruct_is_set]
     hardened_usercopy_is_set = KconfigCheck('self_protection', 'kspp', 'HARDENED_USERCOPY', 'y')
@@ -410,6 +419,7 @@ def add_kconfig_checks(l, arch):
         stackleak_is_set = KconfigCheck('self_protection', 'kspp', 'GCC_PLUGIN_STACKLEAK', 'y')
         l += [stackleak_is_set]
         l += [KconfigCheck('self_protection', 'kspp', 'RANDOMIZE_KSTACK_OFFSET_DEFAULT', 'y')]
+        l += [KconfigCheck('self_protection', 'kspp', 'SCHED_CORE', 'y')]
     if arch in ('X86_64', 'X86_32'):
         l += [KconfigCheck('self_protection', 'kspp', 'DEFAULT_MMAP_MIN_ADDR', '65536')]
     if arch in ('ARM64', 'ARM'):
@@ -456,6 +466,20 @@ def add_kconfig_checks(l, arch):
         l += [AND(KconfigCheck('self_protection', 'clipos', 'INTEL_IOMMU', 'y'),
                   iommu_support_is_set)]
 
+    # 'self_protection', 'my'
+    l += [OR(KconfigCheck('self_protection', 'my', 'RESET_ATTACK_MITIGATION', 'y'),
+             efi_not_set)] # needs userspace support (systemd)
+    if arch == 'X86_64':
+        l += [KconfigCheck('self_protection', 'my', 'SLS', 'y')] # vs CVE-2021-26341 in Straight-Line-Speculation
+        l += [AND(KconfigCheck('self_protection', 'my', 'AMD_IOMMU_V2', 'y'),
+                  iommu_support_is_set)]
+    if arch == 'ARM64':
+        l += [KconfigCheck('self_protection', 'my', 'SHADOW_CALL_STACK', 'y')] # depends on clang, maybe it's alternative to STACKPROTECTOR_STRONG
+        l += [KconfigCheck('self_protection', 'my', 'KASAN_HW_TAGS', 'y')]
+        cfi_clang_is_set = KconfigCheck('self_protection', 'my', 'CFI_CLANG', 'y')
+        l += [cfi_clang_is_set]
+        l += [AND(KconfigCheck('self_protection', 'my', 'CFI_PERMISSIVE', 'is not set'),
+                  cfi_clang_is_set)]
 
     # 'security_policy'
     if arch in ('X86_64', 'ARM64', 'X86_32'):
@@ -463,9 +487,16 @@ def add_kconfig_checks(l, arch):
     if arch == 'ARM':
         l += [KconfigCheck('security_policy', 'kspp', 'SECURITY', 'y')] # and choose your favourite LSM
     l += [KconfigCheck('security_policy', 'kspp', 'SECURITY_YAMA', 'y')]
+    l += [OR(KconfigCheck('security_policy', 'my', 'SECURITY_WRITABLE_HOOKS', 'is not set'),
+             KconfigCheck('security_policy', 'kspp', 'SECURITY_SELINUX_DISABLE', 'is not set'))]
     l += [KconfigCheck('security_policy', 'clipos', 'SECURITY_LOCKDOWN_LSM', 'y')]
     l += [KconfigCheck('security_policy', 'clipos', 'SECURITY_LOCKDOWN_LSM_EARLY', 'y')]
     l += [KconfigCheck('security_policy', 'clipos', 'LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY', 'y')]
+    l += [KconfigCheck('security_policy', 'my', 'SECURITY_SAFESETID', 'y')]
+    loadpin_is_set = KconfigCheck('security_policy', 'my', 'SECURITY_LOADPIN', 'y')
+    l += [loadpin_is_set] # needs userspace support
+    l += [AND(KconfigCheck('security_policy', 'my', 'SECURITY_LOADPIN_ENFORCE', 'y'),
+              loadpin_is_set)]
 
     # 'cut_attack_surface', 'defconfig'
     l += [OR(KconfigCheck('cut_attack_surface', 'defconfig', 'BPF_UNPRIV_DEFAULT_OFF', 'y'),
@@ -566,7 +597,7 @@ def add_kconfig_checks(l, arch):
     l += [KconfigCheck('cut_attack_surface', 'clipos', 'ACPI_TABLE_UPGRADE', 'is not set')] # refers to LOCKDOWN
     l += [KconfigCheck('cut_attack_surface', 'clipos', 'EFI_CUSTOM_SSDT_OVERLAYS', 'is not set')]
     l += [AND(KconfigCheck('cut_attack_surface', 'clipos', 'LDISC_AUTOLOAD', 'is not set'),
-              PresenceCheck('LDISC_AUTOLOAD', 'kconfig'))]
+              KconfigCheck('cut_attack_surface', 'clipos', 'LDISC_AUTOLOAD'))] # option presence check
     if arch in ('X86_64', 'X86_32'):
         l += [KconfigCheck('cut_attack_surface', 'clipos', 'X86_INTEL_TSX_MODE_OFF', 'y')] # tsx=off
 
@@ -576,16 +607,32 @@ def add_kconfig_checks(l, arch):
     l += [KconfigCheck('cut_attack_surface', 'lockdown', 'MMIOTRACE_TEST', 'is not set')] # refers to LOCKDOWN
     l += [KconfigCheck('cut_attack_surface', 'lockdown', 'KPROBES', 'is not set')] # refers to LOCKDOWN
 
+    # 'cut_attack_surface', 'my'
+    l += [OR(KconfigCheck('cut_attack_surface', 'my', 'TRIM_UNUSED_KSYMS', 'y'),
+             modules_not_set)]
+    l += [KconfigCheck('cut_attack_surface', 'my', 'MMIOTRACE', 'is not set')] # refers to LOCKDOWN (permissive)
+    l += [KconfigCheck('cut_attack_surface', 'my', 'LIVEPATCH', 'is not set')]
+    l += [KconfigCheck('cut_attack_surface', 'my', 'IP_DCCP', 'is not set')]
+    l += [KconfigCheck('cut_attack_surface', 'my', 'IP_SCTP', 'is not set')]
+    l += [KconfigCheck('cut_attack_surface', 'my', 'FTRACE', 'is not set')] # refers to LOCKDOWN
+    l += [KconfigCheck('cut_attack_surface', 'my', 'VIDEO_VIVID', 'is not set')]
+    l += [KconfigCheck('cut_attack_surface', 'my', 'INPUT_EVBUG', 'is not set')] # Can be used as a keylogger
 
     # 'harden_userspace'
-    if arch in ('X86_64', 'ARM64', 'X86_32', 'ARM'):
+    if arch in ('X86_64', 'ARM64', 'X86_32'):
         l += [KconfigCheck('harden_userspace', 'defconfig', 'INTEGRITY', 'y')]
+    if arch == 'ARM':
+        l += [KconfigCheck('harden_userspace', 'my', 'INTEGRITY', 'y')]
     if arch == 'ARM64':
         l += [KconfigCheck('harden_userspace', 'defconfig', 'ARM64_MTE', 'y')]
     if arch in ('ARM', 'X86_32'):
         l += [KconfigCheck('harden_userspace', 'defconfig', 'VMSPLIT_3G', 'y')]
     if arch in ('X86_64', 'ARM64'):
         l += [KconfigCheck('harden_userspace', 'clipos', 'ARCH_MMAP_RND_BITS', '32')]
+    if arch in ('X86_32', 'ARM'):
+        l += [KconfigCheck('harden_userspace', 'my', 'ARCH_MMAP_RND_BITS', '16')]
+
+#   l += [KconfigCheck('feature_test', 'my', 'LKDTM', 'm')] # only for debugging!
 
 
 def print_unknown_options(checklist, parsed_options):
@@ -672,6 +719,8 @@ def populate_simple_opt_with_data(opt, data, data_type):
         opt.state = data.get(opt.name, None)
     elif data_type == 'version':
         opt.ver = data
+    else:
+        sys.exit('[!] ERROR: unexpected data type "{}"'.format(data_type))
 
 
 def populate_opt_with_data(opt, data, data_type):

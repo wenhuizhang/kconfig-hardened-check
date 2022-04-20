@@ -17,7 +17,6 @@ against my security hardening preferences, which are based on the
   - [KSPP recommended settings][1],
   - [CLIP OS kernel configuration][2],
   - Last public [grsecurity][3] patch (options which they disable),
-  - [SECURITY_LOCKDOWN_LSM][5] patchset,
   - Direct feedback from Linux kernel maintainers (see [#38][6], [#53][15], [#54][16]).
 
 I also created [__Linux Kernel Defence Map__][4] that is a graphical representation of the
@@ -31,14 +30,13 @@ or exploitation techniques.
   - ARM64
   - ARM
 
-TODO: RISC-V
 
 ## Installation
 
 You can install the package:
 
 ```
-pip install git+https://github.com/a13xp0p0v/kconfig-hardened-check
+pip install git+https://github.com/wenhuizhang/kconfig-hardened-check
 ```
 
 or simply run `./bin/kconfig-hardened-check` from the cloned repository.

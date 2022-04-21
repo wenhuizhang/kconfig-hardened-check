@@ -62,7 +62,7 @@ optional arguments:
   - `-m show_ok` for showing only the successful checks
   - `-m json` for printing the results in JSON format (for combining `kconfig-safety-check` with other tools)
 
-### 3. Example output for `Debian GNU/Linux 9 (stretch)` kernel config
+### 3. Example output for Debian GNU/Linux 9 (stretch):
 
 ```
 $ ./bin/kconfig-safety-check -p X86_64 -c ../linux-image-bsk/.config -m show_fail

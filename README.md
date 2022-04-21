@@ -7,7 +7,7 @@ This tool is to help with checking Linux Configurations.
 
 
 
-## Supported microarchitectures
+## 1. Supported Architectures
 
   - X86_64
   - X86_32
@@ -15,7 +15,7 @@ This tool is to help with checking Linux Configurations.
   - ARM
 
 
-## Installation
+## 2. Installation
 
 You can install the package:
 
@@ -27,9 +27,9 @@ or simply run `./bin/kconfig-safety-check` from the cloned repository.
 
 
 
-## Usage
+## 3. Usage
 
-Example usage:
+### 1. Example usage:
 ```
 ./bin/kconfig-safety-check -p X86_64 -c ../linux-image-bsk/.config -m show_fail
 ```
@@ -52,7 +52,7 @@ optional arguments:
                         choose the report mode
 ```
 
-## Output modes
+### 2. Output modes
 
   -  no `-m` argument for the default output mode (see the example below)
   - `-m verbose` for printing additional info:
@@ -62,7 +62,7 @@ optional arguments:
   - `-m show_ok` for showing only the successful checks
   - `-m json` for printing the results in JSON format (for combining `kconfig-safety-check` with other tools)
 
-## Example output for `Debian GNU/Linux 9 (stretch)` kernel config
+### 3. Example output for `Debian GNU/Linux 9 (stretch)` kernel config
 
 ```
 $ ./bin/kconfig-safety-check -p X86_64 -c ../linux-image-bsk/.config -m show_fail

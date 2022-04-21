@@ -261,7 +261,7 @@ def add_kconfig_checks(l, arch):
     l += [KconfigCheck('elisa_safety', 'elisa', 'INIT_ON_ALLOC_DEFAULT_ON', 'y')]
     l += [KconfigCheck('elisa_safety', 'elisa', 'REFCOUNT_FULL', 'y')]
     l += [KconfigCheck('elisa_safety', 'elisa', 'GCC_PLUGIN_STRUCTKLEAK', 'y')]
-    l += [KconfigCheck('elisa_safety', 'elisa', 'GCC_PLUGIN_STRUCTLEAK_ BYREF_ALL', 'y')]
+    l += [KconfigCheck('elisa_safety', 'elisa', 'GCC_PLUGIN_STRUCTLEAK_BYREF_ALL', 'y')]
     l += [KconfigCheck('elisa_safety', 'elisa', 'INIT_STACK_ALL', 'y')]
     l += [KconfigCheck('elisa_safety', 'elisa', 'BPF_JIT_ALWAYS_ON', 'y')]
     l += [KconfigCheck('elisa_safety', 'elisa', 'BPF_UNPRIV_DEFAULT_OFF', 'y')]

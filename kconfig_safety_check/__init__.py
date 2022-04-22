@@ -334,7 +334,23 @@ def add_kconfig_checks(l, arch):
         l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'ARM64_SSBD', 'y')]
 
     # ELISA security check
-    l += [KconfigCheck('ELISA_security', 'ELISA_security', 'LIVEPATCH', 'n')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY_WRITABLE_HOOKS', 'n')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITYFS', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY_NETWORK', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY_INFINIBAND', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY_NETWORK_XFRM', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY_PATH', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'INTEL_TXT', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'LSM_MMAP_MIN_ADDR', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'HAVE_HARDENED_USERCOPY_ALLOCATOR', 'y')]
+
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'STATIC_USERMODEHELPER', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'STATIC_USERMODEHELPER_PATH', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'DEFAULT_SECURITY_DAC', 'y')]
+
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY_SELINUX', 'y')]
+    l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY_APPARMOR', 'y')]
 
 
 

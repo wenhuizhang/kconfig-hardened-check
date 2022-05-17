@@ -4,8 +4,8 @@
 # Working on X86_64, ARM64, X86_32, and ARM.
 # Based on ELISA: https://docs.google.com/spreadsheets/d/1oiOmWTr94M7vP3sisFyBMftHfXqi2Ogd_DqGEl_dlyQ/edit?userstoinvite=haipeng.zhang.saes@gmail.com&actionButton=1#gid=1056671864
 #
-# Author: Alexander Popov <alex.popov@linux.com>
-#         Wenhui Zhang <wenhui.zhang@bytedance.com>
+# Author: Wenhui Zhang <wenhui.zhang@bytedance.com>
+#         Alexander Popov <alex.popov@linux.com>
 #
 
 
@@ -247,7 +247,7 @@ def detect_version(fname):
         return None, 'no kernel version detected'
 
 
-def add_kconfig_checks(l, arch):
+def add_kconfig_checks(l, arch, envi):
     # Calling the KconfigCheck class constructor:
     #     KconfigCheck(reason, decision, name, expected)
 
@@ -274,7 +274,10 @@ def add_kconfig_checks(l, arch):
     l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'GCC_PLUGIN_STACKLEAK', 'y')]
     l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'PAGE_POISONING', 'y')]
     l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'PAGE_POISONING_NO_SANITY', 'n')]
-    l += [KconfigCheck('Heap memory:Heap overflow:Debug', 'ELISA_safety, Intel', 'DEBUG_LIST', 'y')]
+
+    if envi in ('dev', 'debug'):
+        l += [KconfigCheck('Heap memory:Heap overflow:Debug', 'ELISA_safety, Intel', 'DEBUG_LIST', 'y')]
+
     l += [KconfigCheck('Driver: Heap overflow', 'ELISA_safety', 'DEBUG_SG', 'y')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'BUG_ON_DATA_CORRUPTION', 'y')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'Intel', 'KMEM', 'n')]
@@ -287,38 +290,46 @@ def add_kconfig_checks(l, arch):
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety, Intel', 'HARDENED_USERCOPY', 'y')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HARDENED_USERCOPY_FALLBACK', 'n')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HARDENED_USERCOPY_PAGESPAN', 'n')]
-    l += [KconfigCheck('Kernel Memory:Debug', 'ELISA_safety', 'SECURITY_DMESG_RESTRICT', 'y')]
+
+    if envi in ('dev', 'debug'):
+        l += [KconfigCheck('Kernel Memory:Debug', 'ELISA_safety', 'SECURITY_DMESG_RESTRICT', 'y')]
+
     l += [KconfigCheck('Heap memory:R/W access to memory allocated to another software element', 'ELISA_safety', 'COMPAT_BRK', 'n')]
     l += [KconfigCheck('Heap memory:R/W access to memory allocated to another software element', 'ELISA_safety', 'USERFAULTFD', 'n')]
     l += [KconfigCheck('Heap memory:R/W access to memory allocated to another software element', 'ELISA_safety', 'STRICT_KERNEL_RWX', 'y')]
     l += [KconfigCheck('Heap memory:R/W access to memory allocated to another software element', 'ELISA_safety', 'STRICT_MODULE_RWX', 'y')]
     l += [KconfigCheck('Kernel Memory:W+X access to memory pages', 'ELISA_safety', 'DEBUG_WX', 'y')]
-    l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'STACKTRACE_SUPPORT', 'y')]
-    l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'STACK_TRACER', 'y')]
-    l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'KPROBES', 'n')]
-    l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'PROC_KCORE', 'n')]
-    l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'ELF_CORE', 'y')]
-    l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'PROC_PAGE_MONITOR', 'y')]
-    l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'FTRACE_SYSCALLS', 'y')]
-    l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'KALLSYMS', 'n')]
-    l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'SOFTLOCKUP_DETECTOR', 'y')]
-    l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'DETECT_HUNG_TASK', 'y')]
-    l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'WQ_WATCHDOG', 'y')]
-    l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'KCSAN', 'y')]
-    l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'PROVE_LOCKING', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_RT_MUTEXES', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_SPINLOCK', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_MUTEXES', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_WW_MUTEX_SLOWPATH', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_LOCK_ALLOC', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_LOCKING_API_SELFTESTS', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'LOCK_TORTURE_TEST', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'WW_MUTEX_SELFTEST', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'RCU_TORTURE_TEST', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_ATOMIC_SLEEP', 'y')]
-    l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'SIGNALFD', 'y')]
-    l += [KconfigCheck('Debug:Notification', 'ELISA_safety', 'DEBUG_NOTIFIERS', 'y')]
-    l += [KconfigCheck('Debug:Notification', 'ELISA_safety', 'LOCK_STAT', 'y')]
+
+    if envi in ('dev', 'trace'):
+        l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'STACKTRACE_SUPPORT', 'y')]
+        l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'STACK_TRACER', 'y')]
+        l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'KPROBES', 'n')]
+        l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'PROC_KCORE', 'n')]
+        l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'ELF_CORE', 'y')]
+        l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'PROC_PAGE_MONITOR', 'y')]
+        l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'FTRACE_SYSCALLS', 'y')]
+        l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'KALLSYMS', 'n')]
+
+    if envi in ('dev', 'debug'):
+        l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'SOFTLOCKUP_DETECTOR', 'y')]
+        l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'DETECT_HUNG_TASK', 'y')]
+        l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'WQ_WATCHDOG', 'y')]
+        l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'KCSAN', 'y')]
+        l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'PROVE_LOCKING', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_RT_MUTEXES', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_SPINLOCK', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_MUTEXES', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_WW_MUTEX_SLOWPATH', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_LOCK_ALLOC', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_LOCKING_API_SELFTESTS', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'LOCK_TORTURE_TEST', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'WW_MUTEX_SELFTEST', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'RCU_TORTURE_TEST', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_ATOMIC_SLEEP', 'y')]
+        l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'SIGNALFD', 'y')]
+        l += [KconfigCheck('Debug:Notification', 'ELISA_safety', 'DEBUG_NOTIFIERS', 'y')]
+        l += [KconfigCheck('Debug:Notification', 'ELISA_safety', 'LOCK_STAT', 'y')]
+
     l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'RETPOLINE', 'y')]
     l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'BPF_UNPRIV_DEFAULT_OFF', 'n')]
     l += [KconfigCheck('Live Patch', 'ELISA_safety', 'LIVEPATCH', 'n')]
@@ -498,6 +509,7 @@ def main():
     #   * json mode for printing the results in JSON format
     report_modes = ['verbose', 'json', 'show_ok', 'show_fail']
     supported_archs = ['X86_64', 'X86_32', 'ARM64', 'ARM']
+    supported_env = ['dev', 'prod', 'debug', 'trace']
     parser = ArgumentParser(prog='kconfig-safety-check',
                             description='A tool for checking safety options of the Linux kernel')
     parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
@@ -507,13 +519,20 @@ def main():
                         help='check the kernel kconfig file against these preferences')
     parser.add_argument('-m', '--mode', choices=report_modes,
                         help='choose the report mode')
+    parser.add_argument('-e', '--envi', choices=supported_env,
+                            help='choose the supported env, dev or production')
     args = parser.parse_args()
 
     mode = None
+    envi = None
     if args.mode:
         mode = args.mode
         if mode != 'json':
             print('[+] Special report mode: {}'.format(mode))
+
+    if args.envi:
+        envi = args.envi
+
 
     config_checklist = []
 
@@ -534,7 +553,7 @@ def main():
             print('[+] Detected kernel version: {}.{}'.format(kernel_version[0], kernel_version[1]))
 
         # add relevant kconfig checks to the checklist
-        add_kconfig_checks(config_checklist, arch)
+        add_kconfig_checks(config_checklist, arch, envi)
 
         # populate the checklist with the parsed kconfig data
         parsed_kconfig_options = OrderedDict()
@@ -556,7 +575,7 @@ def main():
         if mode in ('show_ok', 'show_fail'):
             sys.exit('[!] ERROR: wrong mode "{}" for --print'.format(mode))
         arch = args.print
-        add_kconfig_checks(config_checklist, arch)
+        add_kconfig_checks(config_checklist, arch, envi)
         if mode != 'json':
             print('[+] Printing kernel safety configuration preferences for {}...'.format(arch))
         print_checklist(mode, config_checklist, False)

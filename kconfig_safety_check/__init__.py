@@ -520,11 +520,11 @@ def main():
     parser.add_argument('-m', '--mode', choices=report_modes,
                         help='choose the report mode')
     parser.add_argument('-e', '--envi', choices=supported_env,
-                            help='choose the supported env, dev or production')
+                            help='choose the supported env, dev, prod, trace or debug')
     args = parser.parse_args()
 
     mode = None
-    envi = None
+    envi = 'dev'
     if args.mode:
         mode = args.mode
         if mode != 'json':

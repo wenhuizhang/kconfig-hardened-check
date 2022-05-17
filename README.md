@@ -1,7 +1,7 @@
 # kconfig-safety-check
 
 
-There are plenty of safety and security hardening options in the Linux kernel. 
+There are plenty of safety and security hardening options in the Linux kernel.
 
 This tool is to help with checking Linux Configurations.
 
@@ -38,6 +38,7 @@ or simply run `./bin/kconfig-safety-check` from the cloned repository.
 usage: kconfig-safety-check [-h] [--version] [-p {X86_64,X86_32,ARM64,ARM}]
                               [-c CONFIG]
                               [-m {verbose,json,show_ok,show_fail}]
+                              [-e {dev, prod, debug, trace}]
 
 A tool for checking the security hardening options of the Linux kernel
 
@@ -50,6 +51,8 @@ optional arguments:
                         check the kernel config file against these preferences
   -m {verbose,json,show_ok,show_fail}, --mode {verbose,json,show_ok,show_fail}
                         choose the report mode
+  -e {dev, prod, debug, trace}, --env {dev, prod, debug, trace}
+                        choose the check environment
 ```
 
 ### 2. Output modes
@@ -61,6 +64,7 @@ optional arguments:
   - `-m show_fail` for showing only the failed checks
   - `-m show_ok` for showing only the successful checks
   - `-m json` for printing the results in JSON format (for combining `kconfig-safety-check` with other tools)
+
 
 ### 3. Example output for Debian GNU/Linux 9 (stretch):
 
@@ -129,6 +133,3 @@ CONFIG_SECURITY_APPARMOR                |kconfig|     y      |ELISA_security|Lin
 
 [+] Config check is finished: 'OK' - 34 (suppressed in output) / 'FAIL' - 53
 ```
-
-
-

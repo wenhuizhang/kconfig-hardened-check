@@ -252,9 +252,9 @@ def add_kconfig_checks(l, arch, envi):
     #     KconfigCheck(reason, decision, name, expected)
 
     # ELISA safety check
-    l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_RANDOM', 'y')]
+    l += [OR(KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_RANDOM', 'y'),
+             KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_MERGE_DEFAULT', 'n'))]
     l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_HARDENED', 'y')]
-    l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_MERGE_DEFAULT', 'n')]
     l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SHUFFLE_PAGE_ALLOCATOR', 'y')]
 
     if envi in ('dev', 'debug'):

@@ -686,13 +686,18 @@ def main():
             print('[+] Detected architecture: {}'.format(arch))
 
         kernel_version, msg = detect_version(args.config)
+        kernel_version_num = ""
         if not kernel_version:
             sys.exit('[!] ERROR: {}'.format(msg))
         if mode != 'json':
-            print('[+] Detected kernel version: {}.{}'.format(kernel_version[0], kernel_version[1]))
+            if(len(kernel_version) == 2):
+                print('[+] Detected kernel version: {}.{}'.format(kernel_version[0], kernel_version[1]))
+                kernel_version_num = str(kernel_version[0]) + "." + str(kernel_version[1])
+            if(len(kernel_version) == 3):
+                print('[+] Detected kernel version: {}.{}.{}'.format(kernel_version[0], kernel_version[1], kernel_version[2]))
+                kernel_version_num = str(kernel_version[0]) + "." + str(kernel_version[1]) + "." + str(kernel_version[2])
 
-        kernel_version_num = str(kernel_version[0] + kernel_version[1]/10.0)
-
+        print(kernel_version_num)
         # add relevant kconfig checks to the checklist
         add_kconfig_checks(config_checklist, arch, envi, kernel_version_num)
 

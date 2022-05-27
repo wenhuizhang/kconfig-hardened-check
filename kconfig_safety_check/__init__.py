@@ -247,7 +247,7 @@ def detect_version(fname):
         return None, 'no kernel version detected'
 
 
-def add_kconfig_checks(l, arch, envi):
+def add_kconfig_checks(l, arch, envi, kernel_version_num):
     # Calling the KconfigCheck class constructor:
     #     KconfigCheck(reason, decision, name, expected)
 
@@ -262,7 +262,9 @@ def add_kconfig_checks(l, arch, envi):
         l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'INIT_ON_FREE_DEFAULT_ON', 'y')]
         l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'INIT_ON_ALLOC_DEFAULT_ON', 'y')]
 
-    l += [KconfigCheck('Kernel Memory reference count: Use after free', 'ELISA_safety', 'REFCOUNT_FULL', 'y')]
+    if kernel_version_num <= 54: 
+        l += [KconfigCheck('Kernel Memory reference count: Use after free', 'ELISA_safety', 'REFCOUNT_FULL', 'y')]
+    
     l += [KconfigCheck('GCC, plugins, Stack memory:Uninitialized variables', 'ELISA_safety', 'GCC_PLUGIN_STRUCTKLEAK', 'y')]
     l += [KconfigCheck('GCC, plugins, Stack memory:Uninitialized variables', 'ELISA_safety', 'GCC_PLUGIN_STRUCTLEAK_BYREF_ALL', 'y')]
     l += [KconfigCheck('Stack memory:Uninitialized variables', 'ELISA_safety', 'INIT_STACK_ALL', 'y')]
@@ -554,9 +556,11 @@ def main():
             sys.exit('[!] ERROR: {}'.format(msg))
         if mode != 'json':
             print('[+] Detected kernel version: {}.{}'.format(kernel_version[0], kernel_version[1]))
+            
+        kernel_version_num = 10*kernel_version[0] + kernel_version[1]
 
         # add relevant kconfig checks to the checklist
-        add_kconfig_checks(config_checklist, arch, envi)
+        add_kconfig_checks(config_checklist, arch, envi, kernel_version_num)
 
         # populate the checklist with the parsed kconfig data
         parsed_kconfig_options = OrderedDict()
@@ -578,7 +582,7 @@ def main():
         if mode in ('show_ok', 'show_fail'):
             sys.exit('[!] ERROR: wrong mode "{}" for --print'.format(mode))
         arch = args.print
-        add_kconfig_checks(config_checklist, arch, envi)
+        add_kconfig_checks(config_checklist, arch, envi, kernel_version_num)
         if mode != 'json':
             print('[+] Printing kernel safety configuration preferences for {}...'.format(arch))
         print_checklist(mode, config_checklist, False)

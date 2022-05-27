@@ -15,6 +15,7 @@ from argparse import ArgumentParser
 from collections import OrderedDict
 import re
 import json
+from packaging import version
 from .__about__ import __version__
 
 TYPES_OF_CHECKS = ('kconfig', 'version')
@@ -252,22 +253,32 @@ def add_kconfig_checks(l, arch, envi, kernel_version_num):
     #     KconfigCheck(reason, decision, name, expected)
 
     # ELISA safety check
-    l += [OR(KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_RANDOM', 'y'),
+    if(version.parse(kernel_version_num) <= version.parse("5.17") and version.parse(kernel_version_num) >= version.parse("4.13")):
+        l += [OR(KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_RANDOM', 'y'),
              KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_MERGE_DEFAULT', 'n'))]
-    l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_HARDENED', 'y')]
-    l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SHUFFLE_PAGE_ALLOCATOR', 'y')]
+    elif(version.parse(kernel_version_num) < version.parse("4.13") and version.parse(kernel_version_num) >= version.parse("4.7")):
+        l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_RANDOM', 'y')]
 
-    if envi in ('dev', 'debug'):
+    if(version.parse(kernel_version_num) <= version.parse("5.17") and version.parse(kernel_version_num) >= version.parse("4.14")): 
+        l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_HARDENED', 'y')]
+    
+    if(version.parse(kernel_version_num) <= version.parse("5.17") and version.parse(kernel_version_num) >= version.parse("5.2")):
+        l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SHUFFLE_PAGE_ALLOCATOR', 'y')]
+
+    if(envi in ('dev', 'debug')):
         l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'SLUB_DEBUG', 'y')]
         l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'INIT_ON_FREE_DEFAULT_ON', 'y')]
         l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'INIT_ON_ALLOC_DEFAULT_ON', 'y')]
 
-    if kernel_version_num <= 54: 
+    if(version.parse(kernel_version_num) <= version.parse("5.4")): 
         l += [KconfigCheck('Kernel Memory reference count: Use after free', 'ELISA_safety', 'REFCOUNT_FULL', 'y')]
     
     l += [KconfigCheck('GCC, plugins, Stack memory:Uninitialized variables', 'ELISA_safety', 'GCC_PLUGIN_STRUCTKLEAK', 'y')]
     l += [KconfigCheck('GCC, plugins, Stack memory:Uninitialized variables', 'ELISA_safety', 'GCC_PLUGIN_STRUCTLEAK_BYREF_ALL', 'y')]
-    l += [KconfigCheck('Stack memory:Uninitialized variables', 'ELISA_safety', 'INIT_STACK_ALL', 'y')]
+
+    if(version.parse(kernel_version_num) <= version.parse("5.8") and version.parse(kernel_version_num) >= version.parse("5.2")):
+        l += [KconfigCheck('Stack memory:Uninitialized variables', 'ELISA_safety', 'INIT_STACK_ALL', 'y')]
+    
     l += [KconfigCheck('Kernel Memory:Isolation of critical code', 'ELISA_safety', 'BPF_JIT_ALWAYS_ON', 'y')]
     l += [KconfigCheck('Kernel Memory:Isolation of critical code', 'ELISA_safety', 'BPF_UNPRIV_DEFAULT_OFF', 'y')]
     l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety, Intel', 'STACKPROTECTOR', 'y')]
@@ -277,23 +288,35 @@ def add_kconfig_checks(l, arch, envi, kernel_version_num):
     l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety, Intel', 'VMAP_STACK', 'y')]
     l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety, Intel', 'THREAD_INFO_IN_TASK', 'y')]
     l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'GCC_PLUGIN_STACKLEAK', 'y')]
+
     l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'PAGE_POISONING', 'y')]
-    l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'PAGE_POISONING_NO_SANITY', 'n')]
+
+    if(version.parse(kernel_version_num) <= version.parse("5.10")):
+        l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'PAGE_POISONING_NO_SANITY', 'n')]
 
     if envi in ('dev', 'debug'):
         l += [KconfigCheck('Heap memory:Heap overflow:Debug', 'ELISA_safety, Intel', 'DEBUG_LIST', 'y')]
 
     l += [KconfigCheck('Driver: Heap overflow', 'ELISA_safety', 'DEBUG_SG', 'y')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'BUG_ON_DATA_CORRUPTION', 'y')]
-    l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'Intel', 'KMEM', 'n')]
+    
+    if(version.parse(kernel_version_num) <= version.parse("5.12")):
+        l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'Intel', 'KMEM', 'n')]
+    
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety, Intel', 'DEVMEM', 'n')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety, Intel', 'DEVPORT', 'n')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'ACPI_CUSTOM_METHOD', 'n')]
-    l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'LEGACY_PTYS', 'n')]
+    
+    if(version.parse(kernel_version_num) <= version.parse("5.16")):
+        l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'LEGACY_PTYS', 'n')]
+
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HIBERNATION', 'n')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'KEXEC', 'n')]
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety, Intel', 'HARDENED_USERCOPY', 'y')]
-    l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HARDENED_USERCOPY_FALLBACK', 'n')]
+
+    if(version.parse(kernel_version_num) <= version.parse("5.15")):
+        l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HARDENED_USERCOPY_FALLBACK', 'n')]
+    
     l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HARDENED_USERCOPY_PAGESPAN', 'n')]
 
     if envi in ('dev', 'debug'):
@@ -319,7 +342,10 @@ def add_kconfig_checks(l, arch, envi, kernel_version_num):
         l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'SOFTLOCKUP_DETECTOR', 'y')]
         l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'DETECT_HUNG_TASK', 'y')]
         l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'WQ_WATCHDOG', 'y')]
-        l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'KCSAN', 'y')]
+
+        if(version.parse(kernel_version_num) >= version.parse("5.8")):
+            l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'KCSAN', 'y')]
+        
         l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'PROVE_LOCKING', 'y')]
         l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_RT_MUTEXES', 'y')]
         l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_SPINLOCK', 'y')]
@@ -343,10 +369,14 @@ def add_kconfig_checks(l, arch, envi, kernel_version_num):
     if arch in ('X86_64', 'X86_32'):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'DEVKMEM', 'y')]
         l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'PAGE_TABLE_ISOLATION', 'y')]
+    
     if arch in ('ARM', 'ARM64'):
         l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'UNMAP_KERNEL_AT_EL0', 'y')]
         l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'HARDEN_BRANCH_PREDICTOR', 'y')]
-        l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'HARDEN_EL2_VECTORS', 'y')]
+        
+        if(version.parse(kernel_version_num) <= version.parse("5.8") and version.parse(kernel_version_num) >= version.parse("4.17")):
+            l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'HARDEN_EL2_VECTORS', 'y')]
+        
         l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'ARM64_SSBD', 'y')]
 
     # ELISA security check
@@ -557,7 +587,7 @@ def main():
         if mode != 'json':
             print('[+] Detected kernel version: {}.{}'.format(kernel_version[0], kernel_version[1]))
             
-        kernel_version_num = 10*kernel_version[0] + kernel_version[1]
+        kernel_version_num = kernel_version
 
         # add relevant kconfig checks to the checklist
         add_kconfig_checks(config_checklist, arch, envi, kernel_version_num)

@@ -587,7 +587,7 @@ def main():
         if mode != 'json':
             print('[+] Detected kernel version: {}.{}'.format(kernel_version[0], kernel_version[1]))
 
-        kernel_version_num = kernel_version
+        kernel_version_num = str(kernel_version[0] + kernel_version[1]/10.0)
 
         # add relevant kconfig checks to the checklist
         add_kconfig_checks(config_checklist, arch, envi, kernel_version_num)

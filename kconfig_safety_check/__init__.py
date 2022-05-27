@@ -244,7 +244,10 @@ def detect_version(fname):
                 if len(ver_numbers) < 3 or not ver_numbers[0].isdigit() or not ver_numbers[1].isdigit():
                     msg = 'failed to parse the version "' + ver_str + '"'
                     return None, msg
-                return (int(ver_numbers[0]), int(ver_numbers[1])), None
+                if(len(ver_numbers) == 2):
+                    return (int(ver_numbers[0]), int(ver_numbers[1])), None
+                if(len(ver_numbers) == 3):
+                    return (int(ver_numbers[0]), int(ver_numbers[1]), int(ver_numbers[2])), None
         return None, 'no kernel version detected'
 
 

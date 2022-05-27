@@ -266,7 +266,6 @@ def add_kconfig_checks(l, arch, envi, kernel_version_num):
         l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SHUFFLE_PAGE_ALLOCATOR', 'y')]
 
     if(envi in ('dev', 'debug')):
-        // dev and debug
         if(parse_version(kernel_version_num) <= parse_version("5.17") and parse_version(kernel_version_num) >= parse_version("2.6.22")):
             l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'SLUB_DEBUG', 'y')]
 

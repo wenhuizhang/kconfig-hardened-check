@@ -240,7 +240,8 @@ def detect_version(fname):
                 line = line.strip()
                 parts = line.split()
                 ver_str = parts[2]
-                ver_numbers = ver_str.split('.')
+                ver_num = ver_str.split('-')
+                ver_numbers = ver_num[0].split('.')
                 if len(ver_numbers) < 3 or not ver_numbers[0].isdigit() or not ver_numbers[1].isdigit():
                     msg = 'failed to parse the version "' + ver_str + '"'
                     return None, msg

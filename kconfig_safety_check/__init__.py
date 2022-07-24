@@ -249,7 +249,23 @@ def detect_version(fname):
                     return (int(ver_numbers[0]), int(ver_numbers[1])), None
                 if(len(ver_numbers) == 3):
                     return (int(ver_numbers[0]), int(ver_numbers[1]), int(ver_numbers[2])), None
-        return None, 'no kernel version detected'
+    with open(fname, 'r') as f:
+        ver_pattern = re.compile("# Linux kernel version:.*")
+        for line in f.readlines():
+            if ver_pattern.match(line):
+                line = line.strip()
+                parts = line.split()
+                ver_str = parts[4]
+                ver_num = ver_str.split('-')
+                ver_numbers = ver_num[0].split('.')
+                if len(ver_numbers) < 3 or not ver_numbers[0].isdigit() or not ver_numbers[1].isdigit():
+                    msg = 'failed to parse the version "' + ver_str + '"'
+                    return None, msg
+                if(len(ver_numbers) == 2):
+                    return (int(ver_numbers[0]), int(ver_numbers[1])), None
+                if(len(ver_numbers) == 3):
+                    return (int(ver_numbers[0]), int(ver_numbers[1]), int(ver_numbers[2])), None
+    return None, 'no kernel version detected', ver_pattern
 
 
 def add_kconfig_checks(l, arch, envi, kernel_version_num):

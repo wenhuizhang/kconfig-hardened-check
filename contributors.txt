@@ -1,6 +1,11 @@
 Shuah Khan<skhan@linuxfoundation.org>
 Elana Copperman<Elana.Copperman@mobileye.com>
 Wenhui Zhang<wenhui.zhang@bytedance.com>
+Cheng Zhang<zhangcheng.gerard@bytedance.com>
+Cong Wang<cong.wang@bytedance.com>
+Jiang Wang<jiang.wang@bytedance.com>
+Muchun Song<songmuchun@bytedance.com>
+Xiongchun Duan<duanxiongchun@bytedance.com>
 Li Aubrey<aubrey.li@intel.com>
 Li Zhiquan<zhiquan1.li@intel.com>
 Hu Zhiming<zhiming.hu@intel.com>

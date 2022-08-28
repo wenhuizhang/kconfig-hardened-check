@@ -6,6 +6,7 @@ Cong Wang<cong.wang@bytedance.com>
 Jiang Wang<jiang.wang@bytedance.com>
 Muchun Song<songmuchun@bytedance.com>
 Xiongchun Duan<duanxiongchun@bytedance.com>
+Ruide Zhang<ruide.zhang.r@bytedance.com>
 Li Aubrey<aubrey.li@intel.com>
 Li Zhiquan<zhiquan1.li@intel.com>
 Hu Zhiming<zhiming.hu@intel.com>

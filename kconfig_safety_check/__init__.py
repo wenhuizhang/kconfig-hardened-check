@@ -273,227 +273,227 @@ def add_kconfig_checks(l, arch, envi, kernel_version_num):
     #     KconfigCheck(reason, decision, name, expected)
 
     # ELISA safety check
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.13")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.13")):
         l += [OR(KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_RANDOM', 'y'),
              KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_MERGE_DEFAULT', 'n'))]
     elif(parse_version(kernel_version_num) < parse_version("4.13") and parse_version(kernel_version_num) >= parse_version("4.7")):
         l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_RANDOM', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.14")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.14")):
         l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SLAB_FREELIST_HARDENED', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("5.2")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("5.2")):
         l += [KconfigCheck('Memory management:Heap:Use after free', 'ELISA_safety, Intel', 'SHUFFLE_PAGE_ALLOCATOR', 'y')]
 
     if(envi in ('dev', 'debug')):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.22")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.22")):
             l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'SLUB_DEBUG', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("5.3")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("5.3")):
             l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'INIT_ON_FREE_DEFAULT_ON', 'y')]
             l += [KconfigCheck('Memory management:Heap:Debug', 'ELISA_safety', 'INIT_ON_ALLOC_DEFAULT_ON', 'y')]
 
     if(parse_version(kernel_version_num) <= parse_version("5.4") and parse_version(kernel_version_num) >= parse_version("4.13")):
         l += [KconfigCheck('Kernel Memory reference count: Use after free', 'ELISA_safety', 'REFCOUNT_FULL', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.11")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.11")):
         l += [KconfigCheck('GCC, plugins, Stack memory:Uninitialized variables', 'ELISA_safety', 'GCC_PLUGIN_STRUCTKLEAK', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.14")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.14")):
         l += [KconfigCheck('GCC, plugins, Stack memory:Uninitialized variables', 'ELISA_safety', 'GCC_PLUGIN_STRUCTLEAK_BYREF_ALL', 'y')]
 
     if(parse_version(kernel_version_num) <= parse_version("5.8") and parse_version(kernel_version_num) >= parse_version("5.2")):
         l += [KconfigCheck('Stack memory:Uninitialized variables', 'ELISA_safety', 'INIT_STACK_ALL', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.15")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.15")):
         l += [KconfigCheck('Kernel Memory:Isolation of critical code', 'ELISA_safety', 'BPF_JIT_ALWAYS_ON', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("5.13")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("5.13")):
         l += [KconfigCheck('Kernel Memory:Isolation of critical code', 'ELISA_safety', 'BPF_UNPRIV_DEFAULT_OFF', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.18")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.18")):
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety, Intel', 'STACKPROTECTOR', 'y')]
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety, Intel', 'STACKPROTECTOR_STRONG', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.13")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.13")):
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'FORTIFY_SOURCE', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("3.18")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("3.18")):
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety, Intel', 'SCHED_STACK_END_CHECK', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.9")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.9")):
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety, Intel', 'VMAP_STACK', 'y')]
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety, Intel', 'THREAD_INFO_IN_TASK', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.20")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.20")):
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'GCC_PLUGIN_STACKLEAK', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.6")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.6")):
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'PAGE_POISONING', 'y')]
 
     if(parse_version(kernel_version_num) <= parse_version("5.10") and parse_version(kernel_version_num) >= parse_version("4.6")):
         l += [KconfigCheck('Stack memory:Stack overflow', 'ELISA_safety', 'PAGE_POISONING_NO_SANITY', 'n')]
 
     if envi in ('dev', 'debug'):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.19")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.19")):
             l += [KconfigCheck('Heap memory:Heap overflow:Debug', 'ELISA_safety, Intel', 'DEBUG_LIST', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.24")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.24")):
         l += [KconfigCheck('Driver: Heap overflow', 'ELISA_safety', 'DEBUG_SG', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.10")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.10")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'BUG_ON_DATA_CORRUPTION', 'y')]
 
     if(parse_version(kernel_version_num) <= parse_version("5.12") and parse_version(kernel_version_num) >= parse_version("2.6.26")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'Intel', 'KMEM', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.0")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.0")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety, Intel', 'DEVMEM', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.22")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.22")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety, Intel', 'DEVPORT', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("3.0")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("3.0")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'ACPI_CUSTOM_METHOD', 'n')]
 
     if(parse_version(kernel_version_num) <= parse_version("5.16") and parse_version(kernel_version_num) >= parse_version("2.6.39")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'LEGACY_PTYS', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.23")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.23")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HIBERNATION', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.16")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.16")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'KEXEC', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.8")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.8")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety, Intel', 'HARDENED_USERCOPY', 'y')]
 
     if(parse_version(kernel_version_num) <= parse_version("5.15") and parse_version(kernel_version_num) >= parse_version("4.16")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HARDENED_USERCOPY_FALLBACK', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.8")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.8")):
         l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'HARDENED_USERCOPY_PAGESPAN', 'n')]
 
     if envi in ('dev', 'debug'):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.37")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.37")):
             l += [KconfigCheck('Kernel Memory:Debug', 'ELISA_safety', 'SECURITY_DMESG_RESTRICT', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.25")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.25")):
         l += [KconfigCheck('Heap memory:R/W access to memory allocated to another software element', 'ELISA_safety', 'COMPAT_BRK', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.3")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.3")):
         l += [KconfigCheck('Heap memory:R/W access to memory allocated to another software element', 'ELISA_safety', 'USERFAULTFD', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.11")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.11")):
         l += [KconfigCheck('Heap memory:R/W access to memory allocated to another software element', 'ELISA_safety', 'STRICT_KERNEL_RWX', 'y')]
         l += [KconfigCheck('Heap memory:R/W access to memory allocated to another software element', 'ELISA_safety', 'STRICT_MODULE_RWX', 'y')]
 
     if arch in ('ARM', 'ARM64'):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.16")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.16")):
             l += [KconfigCheck('Kernel Memory:W+X access to memory pages', 'ELISA_safety', 'DEBUG_WX', 'y')]
     if arch in ('X86_64', 'X86_32'):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.4")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.4")):
             l += [KconfigCheck('Kernel Memory:W+X access to memory pages', 'ELISA_safety', 'DEBUG_WX', 'y')]
 
     if envi in ('dev', 'trace'):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.18")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.18")):
             l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'STACKTRACE_SUPPORT', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.28")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.28")):
             l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'STACK_TRACER', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.9")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.9")):
             l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'KPROBES', 'n')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.27")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.27")):
             l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'PROC_KCORE', 'n')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.16")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.16")):
             l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'ELF_CORE', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.25")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.25")):
             l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'PROC_PAGE_MONITOR', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.30")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.30")):
             l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'FTRACE_SYSCALLS', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.5.45")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.5.45")):
             l += [KconfigCheck('Stack memory:Enable traceability', 'ELISA_safety', 'KALLSYMS', 'n')]
 
     if envi in ('dev', 'debug'):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.13")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.13")):
             l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'SOFTLOCKUP_DETECTOR', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.30")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.30")):
             l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'DETECT_HUNG_TASK', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.5")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.5")):
             l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'WQ_WATCHDOG', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("5.8")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("5.8")):
             l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'KCSAN', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.18")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.18")):
             l += [KconfigCheck('Debug:Kernel mode lockup', 'ELISA_safety', 'PROVE_LOCKING', 'y')]
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_RT_MUTEXES', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.29")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.29")):
             l += [KconfigCheck('Debug:Notification', 'ELISA_safety', 'DEBUG_NOTIFIERS', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.23")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.23")):
             l += [KconfigCheck('Debug:Notification', 'ELISA_safety', 'LOCK_STAT', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.5.45")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.5.45")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_SPINLOCK', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.16")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.16")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_MUTEXES', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("3.11")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("3.11")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_WW_MUTEX_SLOWPATH', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.18")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.18")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_LOCK_ALLOC', 'y')]
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_LOCKING_API_SELFTESTS', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("3.15")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("3.15")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'LOCK_TORTURE_TEST', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.11")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.11")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'WW_MUTEX_SELFTEST', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.15")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.15")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'RCU_TORTURE_TEST', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("3.1")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("3.1")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'DEBUG_ATOMIC_SLEEP', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.22")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.22")):
             l += [KconfigCheck('Debug:RT mutexes', 'ELISA_safety', 'SIGNALFD', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.15")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.15")):
         l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'RETPOLINE', 'y')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("5.13")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("5.13")):
         l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'BPF_UNPRIV_DEFAULT_OFF', 'n')]
 
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.0")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.0")):
         l += [KconfigCheck('Live Patch', 'ELISA_safety', 'LIVEPATCH', 'n')]
 
 
 
     if arch in ('X86_64', 'X86_32'):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.0")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.0")):
             l += [KconfigCheck('Kernel Memory:Kernel corruption of user space memory', 'ELISA_safety', 'DEVKMEM', 'y')]
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.15")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.15")):
             l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'PAGE_TABLE_ISOLATION', 'y')]
 
 
     if arch in ('ARM', 'ARM64'):
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.16")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.16")):
             l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'UNMAP_KERNEL_AT_EL0', 'y')]
 
-        if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("4.18")):
+        if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("4.18")):
             l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'HARDEN_BRANCH_PREDICTOR', 'y')]
 
         if(parse_version(kernel_version_num) <= parse_version("5.8") and parse_version(kernel_version_num) >= parse_version("4.17")):
@@ -503,7 +503,7 @@ def add_kconfig_checks(l, arch, envi, kernel_version_num):
             l += [KconfigCheck('Branch Target Buffer:Side Channel Attacks', 'ELISA_safety', 'ARM64_SSBD', 'y')]
 
     # ELISA security check
-    if(parse_version(kernel_version_num) <= parse_version("5.19") and parse_version(kernel_version_num) >= parse_version("2.6.23")):
+    if(parse_version(kernel_version_num) <= parse_version("6.7") and parse_version(kernel_version_num) >= parse_version("2.6.23")):
         l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY', 'y')]
         l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITY_WRITABLE_HOOKS', 'n')]
         l += [KconfigCheck('Linux Security Module', 'ELISA_security', 'SECURITYFS', 'y')]
